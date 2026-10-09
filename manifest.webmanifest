@@ -1,0 +1,17 @@
+{
+  "name": "Mi biblioteca",
+  "short_name": "Biblioteca",
+  "description": "Mi diario de lectura: libros leídos, en curso y por leer.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#f3eadb",
+  "theme_color": "#7b1e2e",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

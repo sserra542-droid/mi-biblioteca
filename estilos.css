@@ -1,0 +1,193 @@
+/* Layout: encabezado de portadilla (título + contador + acción), barra de búsqueda y orden,
+   y una cuadrícula de libros apoyados sobre estantes de madera. */
+:root{
+  --papel:#f3eadb; --hoja:#fbf6ec; --borde:#dccdb4; --tinta:#3a271c; --tinta-suave:#7a6352;
+  --bordo:#7b1e2e; --bordo-fuerte:#5f1522; --sobre-bordo:#fbf1e4; --madera:#8a6243; --madera-sombra:#5e3f29;
+  --oro:#b8862f; --estrella-vacia:#d5c4a8; --sombra:rgba(58,39,28,.22); --velo:rgba(40,24,16,.55);
+  --tela1:#6e2a33; --tela2:#3f4a3a; --tela3:#2f4156; --tela4:#6b4a2b; --tela5:#4a3350; --sobre-tela:#f1e3c8; --nota:#f2dc9c;
+  --display:"Cormorant Garamond",Georgia,"Times New Roman",serif;
+  --texto:"Nunito Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --papel:#1d1511; --hoja:#2a1f19; --borde:#4a382c; --tinta:#f0e4d0; --tinta-suave:#b9a48d;
+  --bordo:#a8324a; --bordo-fuerte:#c04460; --sobre-bordo:#fff3e6; --madera:#6b4a33; --madera-sombra:#120c09;
+  --oro:#d9a84a; --estrella-vacia:#5a4739; --sombra:rgba(0,0,0,.5); --velo:rgba(0,0,0,.65);
+  --tela1:#7a2f3a; --tela2:#465341; --tela3:#354a63; --tela4:#775332; --tela5:#553b5c; --sobre-tela:#f1e3c8; --nota:#5a4720;
+  color-scheme:dark } }
+:root[data-theme="dark"]{
+  --papel:#1d1511; --hoja:#2a1f19; --borde:#4a382c; --tinta:#f0e4d0; --tinta-suave:#b9a48d;
+  --bordo:#a8324a; --bordo-fuerte:#c04460; --sobre-bordo:#fff3e6; --madera:#6b4a33; --madera-sombra:#120c09;
+  --oro:#d9a84a; --estrella-vacia:#5a4739; --sombra:rgba(0,0,0,.5); --velo:rgba(0,0,0,.65);
+  --tela1:#7a2f3a; --tela2:#465341; --tela3:#354a63; --tela4:#775332; --tela5:#553b5c; --sobre-tela:#f1e3c8; --nota:#5a4720;
+  color-scheme:dark }
+
+*{box-sizing:border-box}
+body{background:var(--papel);color:var(--tinta);font-family:var(--texto);font-size:16px;line-height:1.5}
+.pagina{max-width:1120px;margin:0 auto;padding-inline:20px;padding-block:36px 64px;display:flex;flex-direction:column;gap:28px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--bordo);outline-offset:2px}
+
+/* Encabezado */
+.cabecera{display:flex;flex-wrap:wrap;align-items:flex-end;justify-content:space-between;gap:20px;border-bottom:1px solid var(--borde);padding-bottom:24px}
+.cabecera>div{min-width:0}
+.sobretitulo{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--bordo);font-weight:700;margin:0 0 4px}
+h1{font-family:var(--display);font-weight:600;font-size:clamp(2.6rem,7vw,4rem);line-height:1;margin:0;text-wrap:balance}
+h1 em{font-weight:500;color:var(--bordo)}
+.contador{margin:12px 0 0;color:var(--tinta-suave)}
+.contador strong{font-family:var(--display);font-size:1.6rem;color:var(--tinta);font-weight:600;font-variant-numeric:tabular-nums;margin-right:4px}
+.boton{border:1px solid var(--borde);background:var(--hoja);border-radius:999px;padding:10px 20px;cursor:pointer;font-weight:600}
+.boton:hover{border-color:var(--tinta-suave)}
+.boton.principal{background:var(--bordo);border-color:var(--bordo);color:var(--sobre-bordo);padding:13px 26px;box-shadow:0 6px 16px -8px var(--bordo)}
+.boton.principal:hover{background:var(--bordo-fuerte);border-color:var(--bordo-fuerte)}
+.boton[disabled]{opacity:.6;cursor:default}
+
+/* Barra */
+.barra{display:flex;flex-wrap:wrap;gap:12px}
+.campo{display:flex;flex-direction:column;gap:6px;min-width:0}
+.campo.busca{flex:1 1 240px}
+.campo>span,.etiqueta{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave);font-weight:700}
+input[type=search],input[type=text],select{background:var(--hoja);border:1px solid var(--borde);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+
+/* Estantería */
+.estante{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:0 22px}
+@media (max-width:420px){.estante{grid-template-columns:repeat(2,minmax(0,1fr));gap:0 14px}}
+.libro{display:flex;flex-direction:column;min-width:0;padding-top:28px}
+.tapa-zona{position:relative;display:flex;align-items:flex-end;padding:0 6px}
+/* tabla del estante: cada libro dibuja su tramo; los tramos se unen cruzando el espacio entre columnas */
+.tapa-zona::after{content:"";position:absolute;left:-11px;right:-11px;bottom:-10px;height:10px;background:var(--madera);border-bottom:3px solid var(--madera-sombra);box-shadow:0 8px 10px -6px var(--sombra)}
+.tapa{position:relative;z-index:1;width:100%;aspect-ratio:2/3;max-width:100%;border-radius:2px 5px 5px 2px;overflow:hidden;background:var(--tela1);box-shadow:0 0 0 1px rgba(0,0,0,.12),6px -2px 14px -4px var(--sombra);transition:transform .2s ease}
+.libro:hover .tapa{transform:translateY(-6px)}
+@media (prefers-reduced-motion:reduce){.tapa{transition:none}.libro:hover .tapa{transform:none}}
+.tapa img{width:100%;height:100%;object-fit:cover;display:block}
+.tapa::before{content:"";position:absolute;inset:0 auto 0 0;width:9px;background:linear-gradient(90deg,rgba(0,0,0,.28),rgba(255,255,255,.12) 60%,rgba(0,0,0,.08));z-index:2;pointer-events:none}
+.tela{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:space-between;padding:16px 12px 14px 20px;color:var(--sobre-tela);text-align:center}
+.tela::after{content:"";position:absolute;inset:8px 8px 8px 16px;border:1px solid var(--sobre-tela);opacity:.45;pointer-events:none}
+.tela b{font-family:var(--display);font-weight:600;font-size:1.15rem;line-height:1.1;overflow-wrap:anywhere;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.tela i{font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;font-style:normal;overflow-wrap:anywhere}
+.ficha{padding:22px 6px 0;display:flex;flex-direction:column;gap:4px;flex:1}
+.ficha h2{font-family:var(--display);font-weight:600;font-size:1.3rem;line-height:1.15;margin:0;overflow-wrap:anywhere;text-wrap:balance}
+.ficha .autor{margin:0;color:var(--tinta-suave);font-size:.9rem;overflow-wrap:anywhere}
+.estrellas{display:inline-flex;gap:1px;margin-left:-4px}
+.estrellas button{background:none;border:0;padding:2px 3px;cursor:pointer;font-size:1.25rem;line-height:1;color:var(--estrella-vacia);border-radius:4px}
+.estrellas button.on{color:var(--oro)}
+.estrellas.grande button{font-size:2rem;padding:2px 5px}
+.acciones{display:flex;flex-wrap:wrap;gap:4px 14px;margin-top:auto;padding-top:6px;font-size:.82rem;align-items:center}
+.enlace{background:none;border:0;padding:2px 0;cursor:pointer;color:var(--tinta-suave);text-decoration:underline;text-underline-offset:3px;font-size:inherit}
+.enlace:hover{color:var(--bordo)}
+.enlace.peligro{color:var(--bordo);font-weight:700}
+
+/* Estados */
+.aviso{border:1px dashed var(--borde);border-radius:14px;padding:48px 24px;text-align:center;color:var(--tinta-suave);display:flex;flex-direction:column;align-items:center;gap:14px}
+.aviso h2{font-family:var(--display);font-size:1.9rem;font-weight:600;color:var(--tinta);margin:0;text-wrap:balance}
+.aviso p{margin:0;max-width:46ch}
+.pie{font-size:.8rem;color:var(--tinta-suave);margin:0}
+
+/* Diálogo */
+dialog{border:1px solid var(--borde);border-radius:16px;background:var(--hoja);color:var(--tinta);padding:0;width:min(560px,calc(100% - 32px));max-height:calc(100% - 32px);box-shadow:0 30px 60px -20px var(--sombra)}
+dialog::backdrop{background:var(--velo)}
+form{padding:26px;display:flex;flex-direction:column;gap:18px}
+form h2{font-family:var(--display);font-size:2rem;font-weight:600;margin:0;line-height:1.1}
+.dos{display:flex;gap:20px;flex-wrap:wrap}
+.dos .previa{flex:0 0 120px}
+.dos .datos{flex:1 1 220px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.previa .tapa{box-shadow:0 0 0 1px rgba(0,0,0,.12),4px 4px 12px -4px var(--sombra)}
+.previa .enlace{margin-top:8px;font-size:.82rem}
+.ayuda{font-size:.8rem;color:var(--tinta-suave);margin:0}
+.error{color:var(--bordo);font-weight:600;font-size:.88rem;margin:0}
+.botones{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+
+/* Ficha de reseña: una hoja de diario de lectura */
+dialog{width:min(800px,calc(100% - 24px))}
+.hoja{padding:30px 28px;gap:22px}
+.hoja h2{font-size:clamp(2rem,6vw,2.7rem);font-variant:small-caps;letter-spacing:.03em;border-bottom:3px double var(--borde);padding-bottom:10px}
+.arriba{display:flex;flex-wrap:wrap;gap:24px}
+.arriba .datos{flex:1 1 280px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.lateral{flex:0 0 180px;max-width:100%;margin-inline:auto;display:flex;flex-direction:column;align-items:center;gap:8px}
+.lateral .tapa{cursor:pointer;box-shadow:0 0 0 1px rgba(0,0,0,.12),4px 4px 12px -4px var(--sombra)}
+.lateral .estrellas{margin:0}
+.lateral .estrellas button{font-size:1.5rem;padding:2px 4px}
+.lateral .enlace{font-size:.82rem}
+.renglon{display:flex;align-items:baseline;gap:10px;min-width:0}
+.renglon>span{flex:0 0 auto}
+.renglon>span,.titulillo{font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tinta-suave);font-weight:700;margin:0}
+.hoja .linea{flex:1;min-width:0;width:100%;border:0;border-bottom:1px solid var(--tinta-suave);border-radius:0;background:transparent;padding:4px 2px}
+.fechas{display:flex;flex-wrap:wrap;gap:12px 16px}
+.fechas .renglon{flex:1 1 150px}
+.formatos{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.9rem;border:0;padding:0;margin:0}
+.formatos label{display:inline-flex;align-items:center;gap:6px;cursor:pointer}
+.formatos input{accent-color:var(--bordo)}
+.bloque{display:flex;flex-direction:column;gap:6px;min-width:0}
+.hoja textarea{font:inherit;color:inherit;width:100%;border:0;resize:vertical;background:transparent}
+.hoja textarea.rayado{line-height:28px;padding:0 2px;min-height:84px;background-image:repeating-linear-gradient(transparent 0 27px,var(--borde) 27px 28px);background-attachment:local}
+.abajo{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:22px;align-items:start}
+.personaje{display:flex;align-items:center;gap:8px}
+.personaje b{color:var(--oro);font-size:1.2rem;line-height:1}
+.hoja .chip{flex:1;min-width:0;width:100%;border:1px solid var(--borde);background:var(--papel);border-radius:8px;padding:7px 10px}
+.nota{background:var(--nota);padding:12px 12px 8px;transform:rotate(-1.2deg);box-shadow:2px 5px 10px -4px var(--sombra)}
+.nota .titulillo{color:var(--tinta);text-align:center}
+.nota textarea{min-height:110px}
+
+/* Secciones */
+.pestanas{display:flex;flex-wrap:wrap;gap:6px 28px;border-bottom:1px solid var(--borde)}
+.pestanas button{background:none;border:0;border-bottom:3px solid transparent;margin-bottom:-1px;padding:6px 2px 10px;cursor:pointer;font-family:var(--display);font-size:1.5rem;font-weight:600;color:var(--tinta-suave);display:inline-flex;align-items:baseline;gap:8px}
+.pestanas button[aria-pressed="true"]{color:var(--tinta);border-bottom-color:var(--bordo)}
+.pestanas button span{font-family:var(--texto);font-size:.8rem;font-weight:700;color:var(--bordo);font-variant-numeric:tabular-nums}
+.cabecera{border-bottom:0;padding-bottom:0}
+.boton.marcar{align-self:flex-start;margin-top:6px;padding:7px 14px;font-size:.85rem;border-color:var(--bordo);color:var(--bordo)}
+.boton.marcar:hover{background:var(--bordo);color:var(--sobre-bordo)}
+.hoja.pendiente .solo-leido{display:none}
+.busqueda{border:1px dashed var(--borde);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px;background:var(--papel)}
+.busqueda .fila{display:flex;gap:8px;flex-wrap:wrap}
+.busqueda .fila input{flex:1 1 180px}
+#b-resultados{display:flex;flex-direction:column;gap:6px}
+#b-resultados button{text-align:left;background:var(--hoja);border:1px solid var(--borde);border-radius:8px;padding:8px 12px;cursor:pointer;overflow-wrap:anywhere}
+#b-resultados button:hover{border-color:var(--bordo)}
+#b-resultados button b{font-family:var(--display);font-size:1.15rem;font-weight:600}
+#b-resultados button small{display:block;color:var(--tinta-suave)}
+
+/* Ajustes para pantallas angostas y estante vacío */
+.barra .campo:not(.busca){flex:1 1 140px}
+.pestanas{flex-wrap:nowrap;gap:6px 22px;overflow-x:auto}
+.pestanas button{white-space:nowrap;font-size:clamp(1.15rem,4.6vw,1.5rem)}
+.fantasmas{display:flex;justify-content:center;align-items:flex-end;gap:10px;width:min(320px,100%);padding:0 14px;border-bottom:10px solid var(--madera);box-shadow:0 3px 0 var(--madera-sombra)}
+.fantasmas i{flex:1 1 0;max-width:58px;aspect-ratio:2/3;border:1.5px dashed var(--tinta-suave);border-bottom:0;border-radius:2px 4px 0 0;opacity:.55}
+.fantasmas i:nth-child(2){aspect-ratio:2/3.4}.fantasmas i:nth-child(4){aspect-ratio:2/2.7}
+@media (max-width:520px){
+  .pagina{gap:20px;padding-block:24px 48px}
+  .cabecera{gap:14px}
+  .boton.principal{padding:11px 20px}
+  .aviso{padding:32px 18px}
+}
+
+/* ---------- Aplicación instalable: acceso, cuenta y estados ---------- */
+html{-webkit-text-size-adjust:100%}
+body{margin:0;min-height:100vh;padding:env(safe-area-inset-top,0) env(safe-area-inset-right,0) env(safe-area-inset-bottom,0) env(safe-area-inset-left,0)}
+[hidden]{display:none!important}
+img{max-width:100%}
+code{background:var(--papel);border:1px solid var(--borde);border-radius:5px;padding:1px 5px;font-size:.9em}
+.pantalla{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 16px}
+.tarjeta-acceso{width:min(420px,100%);background:var(--hoja);border:1px solid var(--borde);border-radius:16px;padding:32px 26px;display:flex;flex-direction:column;gap:16px;box-shadow:0 30px 60px -30px var(--sombra)}
+.tarjeta-acceso h1{font-size:2.8rem}
+.tarjeta-acceso p{margin:0}
+input[type=email],input[type=password],input[type=url]{background:var(--hoja);border:1px solid var(--borde);border-radius:10px;padding:10px 12px;width:100%;min-width:0}
+.tarjeta-acceso input{background:var(--papel)}
+.lado{display:flex;flex-direction:column;align-items:flex-end;gap:10px;min-width:0}
+.cuenta{margin:0;font-size:.82rem;color:var(--tinta-suave);overflow-wrap:anywhere;text-align:right}
+@media (max-width:520px){.lado{align-items:flex-start}.cuenta{text-align:left}}
+.hoja select.linea{appearance:auto;padding:6px 2px}
+.hoja[data-estado="quiero_leer"] .no-pendiente{display:none}
+.hoja:not([data-estado="leido"]) .solo-leido{display:none}
+.formatos legend{margin-bottom:6px;padding:0}
+.nota .titulillo{display:block}
+.campo.ancho{width:100%}
+.campo.ancho input{font-size:.85rem;padding:7px 9px}
+#b-resultados button{display:flex;align-items:center;gap:12px;color:inherit;font:inherit}
+#b-resultados button img{width:34px;height:50px;object-fit:cover;border-radius:2px;flex:0 0 auto;background:var(--borde)}
+#b-resultados button span{min-width:0}
+
+/* Acceso: registro, ingreso y recuperación */
+.subtitulo{color:var(--tinta-suave);text-wrap:balance}
+.acceso-enlaces{display:flex;flex-wrap:wrap;justify-content:space-between;gap:8px 16px;font-size:.9rem}
+.ok{margin:0;font-weight:600;font-size:.9rem;color:var(--tinta);background:var(--papel);border:1px solid var(--borde);border-radius:10px;padding:10px 12px}
+.campo small.ayuda{font-size:.78rem}
+.cuenta #cuenta-correo{font-family:var(--display);font-size:1.25rem;font-weight:600;color:var(--tinta)}

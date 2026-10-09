@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Mi biblioteca</title>
+<meta name="description" content="Mi diario de lectura: libros leídos, en curso y por leer.">
+<meta name="theme-color" content="#7b1e2e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Biblioteca">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Nunito+Sans:opsz,wght@6..12,400;6..12,600;6..12,700&display=swap">
+<link rel="stylesheet" href="estilos.css">
+</head>
+<body>
+
+<!-- Falta configurar Supabase -->
+<main class="pantalla" id="config-falta" hidden>
+  <div class="tarjeta-acceso">
+    <p class="sobretitulo">Falta un paso</p>
+    <h1>Mi <em>biblioteca</em></h1>
+    <p>Todavía no está conectada a la base de datos. Abrí el archivo <code>config.js</code> y pegá la URL y la clave pública de tu proyecto de Supabase. El paso a paso está en <code>LEEME.md</code>.</p>
+  </div>
+</main>
+
+<!-- Registro e inicio de sesión -->
+<main class="pantalla" id="acceso" hidden>
+  <form class="tarjeta-acceso" id="form-acceso" novalidate>
+    <p class="sobretitulo">Diario de lectura</p>
+    <h1>Mi <em>biblioteca</em></h1>
+    <p class="subtitulo" id="a-titulo">Ingresá a tu biblioteca</p>
+    <label class="campo" id="a-campo-usuario" hidden><span>Nombre de usuario</span>
+      <input type="text" id="a-usuario" autocomplete="username" maxlength="20" autocapitalize="none" spellcheck="false">
+      <small class="ayuda">De 3 a 20 caracteres: letras, números, punto o guion bajo.</small></label>
+    <label class="campo" id="a-campo-correo"><span>Correo electrónico</span><input type="email" id="a-correo" autocomplete="email"></label>
+    <label class="campo" id="a-campo-clave"><span id="a-clave-rotulo">Contraseña</span><input type="password" id="a-clave" autocomplete="current-password" minlength="6"></label>
+    <p class="error" id="a-mensaje" hidden></p>
+    <button type="submit" class="boton principal" id="a-enviar">Ingresar</button>
+    <div class="acceso-enlaces">
+      <button type="button" class="enlace" id="a-ir-crear">Crear una cuenta</button>
+      <button type="button" class="enlace" id="a-ir-recuperar">Olvidé mi contraseña</button>
+      <button type="button" class="enlace" id="a-ir-ingresar" hidden>Volver a ingresar</button>
+    </div>
+  </form>
+</main>
+
+<!-- Aplicación -->
+<div class="pagina" id="app" hidden>
+  <header class="cabecera">
+    <div>
+      <p class="sobretitulo">Diario de lectura</p>
+      <h1>Mi <em>biblioteca</em></h1>
+      <p class="contador" id="contador" aria-live="polite">Abriendo los estantes…</p>
+    </div>
+    <div class="lado">
+      <button class="boton principal" id="btn-agregar" type="button">+ Agregar libro</button>
+      <p class="cuenta"><span id="cuenta-correo"></span> · <button type="button" class="enlace" id="salir">Cerrar sesión</button></p>
+    </div>
+  </header>
+
+  <nav class="pestanas" aria-label="Secciones">
+    <button type="button" id="tab-leido" aria-pressed="true">Leídos <span id="n-leido"></span></button>
+    <button type="button" id="tab-leyendo" aria-pressed="false">Leyendo <span id="n-leyendo"></span></button>
+    <button type="button" id="tab-quiero_leer" aria-pressed="false">Quiero leer <span id="n-quiero_leer"></span></button>
+  </nav>
+
+  <section class="barra" aria-label="Buscar y ordenar">
+    <label class="campo busca"><span>Buscar</span>
+      <input type="search" id="buscar" placeholder="Título o autor" autocomplete="off"></label>
+    <label class="campo"><span>Ordenar por</span>
+      <select id="orden">
+        <option value="reciente">Agregados recientemente</option>
+        <option value="titulo">Título (A–Z)</option>
+        <option value="autor">Autor (A–Z)</option>
+        <option value="mejor">Calificación: mayor a menor</option>
+        <option value="peor">Calificación: menor a mayor</option>
+      </select></label>
+    <label class="campo" id="campo-filtro"><span>Calificación</span>
+      <select id="filtro">
+        <option value="0">Todas</option>
+        <option value="5">★★★★★</option>
+        <option value="4">★★★★ o más</option>
+        <option value="3">★★★ o más</option>
+        <option value="-2">★★ o menos</option>
+      </select></label>
+  </section>
+
+  <main>
+    <div class="estante" id="estante"></div>
+    <div class="aviso" id="aviso" hidden></div>
+  </main>
+  <p class="pie" id="pie" aria-live="polite"></p>
+</div>
+
+<dialog id="dlg" aria-labelledby="dlg-titulo">
+  <form id="form" class="hoja" novalidate>
+    <h2 id="dlg-titulo">Reseña del libro</h2>
+    <div class="busqueda" id="busqueda">
+      <label class="campo" for="b-texto"><span>Buscar el libro para completar sus datos y su portada</span></label>
+      <div class="fila"><input type="text" id="b-texto" placeholder="Título o autor" maxlength="150"><button type="button" class="boton" id="b-buscar">Buscar</button></div>
+      <p class="ayuda" id="b-estado"></p>
+      <div id="b-resultados"></div>
+    </div>
+    <div class="arriba">
+      <div class="datos">
+        <label class="renglon"><span>Título</span><input class="linea" type="text" id="f-titulo" maxlength="200" required></label>
+        <label class="renglon"><span>Autor</span><input class="linea" type="text" id="f-autor" maxlength="150" required></label>
+        <label class="renglon"><span>Estado</span>
+          <select class="linea" id="f-estado">
+            <option value="quiero_leer">Quiero leer</option>
+            <option value="leyendo">Leyendo</option>
+            <option value="leido">Leído</option>
+          </select></label>
+        <label class="renglon"><span>Tipo</span>
+          <select class="linea" id="f-tipo_serie">
+            <option value="">Libro único</option>
+            <option value="bilogia">Bilogía (2 libros)</option>
+            <option value="trilogia">Trilogía (3 libros)</option>
+            <option value="tetralogia">Tetralogía (4 libros)</option>
+            <option value="saga">Saga (5 libros o más)</option>
+          </select></label>
+        <label class="renglon" id="renglon-serie"><span>Nombre de la saga</span><input class="linea" type="text" id="f-serie" maxlength="150"></label>
+        <label class="renglon"><span>Género</span>
+          <select class="linea" id="f-genero">
+            <option value="">Sin indicar</option>
+            <option>Novela</option>
+            <option>Romance</option>
+            <option>Fantasía</option>
+            <option>Ciencia ficción</option>
+            <option>Distopía</option>
+            <option>Misterio y policial</option>
+            <option>Thriller</option>
+            <option>Terror</option>
+            <option>Histórica</option>
+            <option>Juvenil</option>
+            <option>Clásicos</option>
+            <option>Cuentos</option>
+            <option>Poesía</option>
+            <option>Teatro</option>
+            <option>Ensayo</option>
+            <option>Biografía y memorias</option>
+            <option>Autoayuda</option>
+            <option>No ficción</option>
+            <option>Otro</option>
+          </select></label>
+        <div class="fechas no-pendiente">
+          <label class="renglon"><span>Inicio</span><input class="linea" type="date" id="f-fecha_inicio"></label>
+          <label class="renglon solo-leido"><span>Fin</span><input class="linea" type="date" id="f-fecha_fin"></label>
+        </div>
+        <label class="renglon"><span>Páginas</span><input class="linea" type="number" id="f-paginas" min="1" max="99999" inputmode="numeric"></label>
+        <fieldset class="formatos no-pendiente"><legend class="titulillo">Formato</legend>
+          <label><input type="radio" name="formato" value="papel"> Libro en papel</label>
+          <label><input type="radio" name="formato" value="digital"> Digital</label>
+          <label><input type="radio" name="formato" value="audio"> Audiolibro</label>
+        </fieldset>
+      </div>
+      <div class="lateral">
+        <div class="tapa" id="previa" title="Elegir portada"></div>
+        <div class="estrellas grande solo-leido" id="f-estrellas" role="radiogroup" aria-label="Tu calificación"></div>
+        <input type="file" id="f-portada" accept="image/*" hidden>
+        <button type="button" class="enlace" id="elegir-portada">Subir una imagen</button>
+        <button type="button" class="enlace" id="quitar-portada" hidden>Quitar portada</button>
+        <label class="campo ancho"><span>o enlace de la imagen</span><input type="url" id="f-portada-url" placeholder="https://…"></label>
+      </div>
+    </div>
+    <label class="bloque solo-leido"><span class="titulillo">Mi reseña</span><textarea class="rayado" id="f-resena" rows="4" maxlength="8000"></textarea></label>
+    <p class="error" id="f-error" hidden></p>
+    <div class="botones">
+      <button type="button" class="boton" id="cancelar">Cerrar</button>
+      <button type="submit" class="boton principal" id="guardar">Guardar</button>
+    </div>
+  </form>
+</dialog>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"></script>
+<script src="config.js"></script>
+<script src="app.js"></script>
+<script>
+/* Si la app no cargó (por ejemplo, se abrió index.html sin extraer la carpeta), avisar en vez de dejar la pantalla en blanco. */
+if(!window.BIBLIOTECA_APP){
+  document.body.insertAdjacentHTML('afterbegin',
+    '<div style="max-width:520px;margin:48px auto;padding:24px;font:16px/1.5 system-ui,sans-serif;color:#3a271c;background:#fbf6ec;border:1px solid #dccdb4;border-radius:14px">' +
+    '<h1 style="margin:0 0 12px;font-size:1.6rem">Faltan archivos de la aplicación</h1>' +
+    '<p style="margin:0 0 10px">Esta página necesita los demás archivos de la carpeta (<b>app.js</b>, <b>estilos.css</b>, <b>config.js</b>) al lado de <b>index.html</b>.</p>' +
+    '<p style="margin:0">Si la abriste desde el archivo .zip: cerrá esta pestaña, hacé clic derecho sobre el zip, elegí <b>Extraer todo</b> y abrí el <b>index.html</b> de la carpeta extraída.</p></div>');
+}
+</script>
+</body>
+</html>
